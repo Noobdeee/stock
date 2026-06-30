@@ -1,55 +1,297 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tile Shop Inventory</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tile Shop Inventory</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#f4f4f4;
+    padding:20px;
+}
+
+.container{
+    max-width:1100px;
+    margin:auto;
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    box-shadow:0 5px 15px rgba(0,0,0,.15);
+}
+
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.form{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:10px;
+}
+
+input{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+}
+
+button{
+    padding:10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    color:white;
+    font-weight:bold;
+}
+
+.addBtn{
+    background:#007bff;
+}
+
+.editBtn{
+    background:#28a745;
+}
+
+.deleteBtn{
+    background:#dc3545;
+}
+
+.search{
+    margin:20px 0;
+}
+
+.search input{
+    width:100%;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:#007bff;
+    color:white;
+    padding:12px;
+}
+
+td{
+    border-bottom:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+tr:hover{
+    background:#f2f2f2;
+}
+
+.total{
+    margin:15px 0;
+    font-size:18px;
+    font-weight:bold;
+}
+
+@media(max-width:700px){
+table{
+display:block;
+overflow-x:auto;
+}
+}
+</style>
+
 </head>
 <body>
 
 <div class="container">
-    <h1>🏪 Tile Shop Inventory</h1>
 
-    <div class="form">
-        <input type="text" id="tileName" placeholder="Tile Name">
+<h1>🏪 Tile Shop Inventory</h1>
 
-        <input type="text" id="tileSize" placeholder="Size (2×2, 12×18...)">
+<div class="form">
+<input id="name" placeholder="Tile Name">
+<input id="size" placeholder="Size">
+<input id="brand" placeholder="Brand">
+<input id="stock" type="number" placeholder="Boxes">
+<button class="addBtn" onclick="addItem()">Add Tile</button>
+</div>
 
-        <input type="text" id="brand" placeholder="Brand">
+<div class="search">
+<input id="search" placeholder="Search..." onkeyup="searchItem()">
+</div>
 
-        <input type="number" id="stock" placeholder="Boxes">
+<div class="total">
+Total Boxes :
+<span id="total">0</span>
+</div>
 
-        <button onclick="addItem()">Add Tile</button>
-    </div>
+<table>
 
-    <div class="searchBox">
-        <input type="text"
-               id="search"
-               placeholder="Search tile..."
-               onkeyup="searchItem()">
-    </div>
+<thead>
+<tr>
+<th>Tile Name</th>
+<th>Size</th>
+<th>Brand</th>
+<th>Boxes</th>
+<th>Actions</th>
+</tr>
+</thead>
 
-    <h3>Total Boxes: <span id="totalBoxes">0</span></h3>
+<tbody id="tableBody"></tbody>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Tile Name</th>
-                <th>Size</th>
-                <th>Brand</th>
-                <th>Stock</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-
-        <tbody id="inventoryTable">
-        </tbody>
-    </table>
+</table>
 
 </div>
 
-<script src="script.js"></script>
+<script>
+
+let inventory=JSON.parse(localStorage.getItem("inventory"))||[];
+
+function save(){
+localStorage.setItem("inventory",JSON.stringify(inventory));
+render();
+}
+
+function addItem(){
+
+let name=document.getElementById("name").value.trim();
+let size=document.getElementById("size").value.trim();
+let brand=document.getElementById("brand").value.trim();
+let stock=parseInt(document.getElementById("stock").value);
+
+if(name==""||size==""||brand==""||isNaN(stock)){
+alert("Fill all fields");
+return;
+}
+
+inventory.push({
+name,
+size,
+brand,
+stock
+});
+
+document.getElementById("name").value="";
+document.getElementById("size").value="";
+document.getElementById("brand").value="";
+document.getElementById("stock").value="";
+
+save();
+
+}
+
+function render(){
+
+let body=document.getElementById("tableBody");
+
+body.innerHTML="";
+
+let total=0;
+
+inventory.forEach((item,index)=>{
+
+total+=Number(item.stock);
+
+body.innerHTML+=`
+<tr>
+
+<td>${item.name}</td>
+
+<td>${item.size}</td>
+
+<td>${item.brand}</td>
+
+<td>${item.stock}</td>
+
+<td>
+
+<button class="editBtn" onclick="editItem(${index})">
+Edit
+</button>
+
+<button class="deleteBtn" onclick="deleteItem(${index})">
+Delete
+</button>
+
+</td>
+
+</tr>
+`;
+
+});
+
+document.getElementById("total").innerText=total;
+
+}
+
+function deleteItem(index){
+
+if(confirm("Delete this item?")){
+
+inventory.splice(index,1);
+
+save();
+
+}
+
+}
+
+function editItem(index){
+
+let item=inventory[index];
+
+let name=prompt("Tile Name",item.name);
+
+if(name===null)return;
+
+let size=prompt("Size",item.size);
+
+if(size===null)return;
+
+let brand=prompt("Brand",item.brand);
+
+if(brand===null)return;
+
+let stock=prompt("Boxes",item.stock);
+
+if(stock===null)return;
+
+inventory[index]={
+name:name,
+size:size,
+brand:brand,
+stock:Number(stock)
+};
+
+save();
+
+}
+
+function searchItem(){
+
+let value=document.getElementById("search").value.toLowerCase();
+
+let rows=document.querySelectorAll("#tableBody tr");
+
+rows.forEach(row=>{
+
+row.style.display=row.innerText.toLowerCase().includes(value)
+?"":"none";
+
+});
+
+}
+
+render();
+
+</script>
 
 </body>
 </html>
