@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tile Shop Inventory</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>🏪 Tile Shop Inventory</h1>
+
+    <div class="form">
+        <input type="text" id="tileName" placeholder="Tile Name">
+
+        <input type="text" id="tileSize" placeholder="Size (2×2, 12×18...)">
+
+        <input type="text" id="brand" placeholder="Brand">
+
+        <input type="number" id="stock" placeholder="Boxes">
+
+        <button onclick="addItem()">Add Tile</button>
+    </div>
+
+    <div class="searchBox">
+        <input type="text"
+               id="search"
+               placeholder="Search tile..."
+               onkeyup="searchItem()">
+    </div>
+
+    <h3>Total Boxes: <span id="totalBoxes">0</span></h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Tile Name</th>
+                <th>Size</th>
+                <th>Brand</th>
+                <th>Stock</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+        <tbody id="inventoryTable">
+        </tbody>
+    </table>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
