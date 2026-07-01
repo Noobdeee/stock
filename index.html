@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tile Shop Inventory v5.20</title>
+<title>T.S.I. v5.20</title>
 
 <style>
 *{
@@ -195,7 +195,25 @@ margin-bottom:15px;
 
     
     
+.drag-cell{
+    width:45px;
+    text-align:center;
+}
 
+.drag-handle{
+    cursor:grab;
+    font-size:22px;
+    user-select:none;
+}
+
+.dragging{
+    opacity:.45;
+    background:#d8ecff!important;
+}
+
+.drop-target{
+    border-top:4px solid #007bff;
+}
 
     
 </style>
@@ -254,13 +272,15 @@ onkeyup="searchTile()">
 <table>
     
 <thead>
-<tr>
+   <tr>
+<th id="dragHead" style="display:none;">↕</th>
 <th>Name</th>
 <th>Size</th>
 <th>Design</th>
 <th>Boxes</th>
 <th>Action</th>
 </tr>
+    
 </thead>
 
 <tbody id="tableBody">
@@ -308,7 +328,6 @@ onkeyup="searchTile()">
     
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-
 import {
 
 getFirestore,
@@ -322,8 +341,10 @@ getDocs,
 deleteDoc,
 
 doc,
-
-updateDoc
+updateDoc,
+query,
+orderBy,
+writeBatch
 
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
@@ -368,7 +389,8 @@ const db=getFirestore(app);
 
 let editId=null;
 let isAdmin = false;
-
+let draggedRow = null;
+    
 const ADMIN_PASSWORD = "1234"; // Change this
 
 
@@ -377,58 +399,78 @@ const ADMIN_PASSWORD = "1234"; // Change this
 
 
 
-    
-async function loadTiles(){
 
-const tbody=document.getElementById("tableBody");
 
-tbody.innerHTML="";
+    async function loadTiles(){
+
+const tbody = document.getElementById("tableBody");
+
+tbody.innerHTML = "";
 let totalBoxes = 0;
-const snap=await getDocs(collection(db,"tiles"));
+
+const q = query(
+    collection(db,"tiles"),
+    orderBy("order")
+);
+
+const snap = await getDocs(q);
 
 snap.forEach(d=>{
 
-const data=d.data();
-    totalBoxes += parseInt(data.boxes) || 0;
+const data = d.data();
 
-    
-    
-tbody.innerHTML+=`
+totalBoxes += parseInt(data.boxes) || 0;
 
-<tr>
+tbody.innerHTML += `
+
+<tr data-id="${d.id}" ${isAdmin ? 'draggable="true"' : ''}>
+
+${
+isAdmin
+?
+`
+<td class="drag-cell">
+    <span class="drag-handle">☰</span>
+</td>
+`
+:
+`<td></td>`
+}
+
 <td>${data.name}</td>
+
 <td>${data.size}</td>
+
 <td>${data.design}</td>
 
 <td>
+
 <div class="stock-box">
+
 <div class="stock-count">
 📦 ${data.boxes}
 </div>
 
 <div class="stock-time">
+
 🕒 ${
 data.lastUpdated
-? new Date(data.lastUpdated).toLocaleString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true
+? new Date(data.lastUpdated).toLocaleString("en-GB",{
+day:"numeric",
+month:"short",
+year:"numeric",
+hour:"numeric",
+minute:"2-digit",
+hour12:true
 })
 : "Not Available"
 }
+
 </div>
 
 </div>
-</div>
+
 </td>
-
-
-
-
-
 
 <td>
 
@@ -455,22 +497,137 @@ Delete
 
 </td>
 
-
 </tr>
 
 `;
 
 });
 
+document.getElementById("totalBoxes").innerText = totalBoxes;
 
-    document.getElementById("totalBoxes").innerText = totalBoxes;
+
+        if(isAdmin){
+
+const rows=document.querySelectorAll("#tableBody tr");
+
+rows.forEach(row=>{
+
+row.addEventListener("dragstart",()=>{
+
+draggedRow=row;
+row.classList.add("dragging");
+
+});
+
+row.addEventListener("dragend",()=>{
+
+row.classList.remove("dragging");
+
+});
+
+row.addEventListener("dragover",(e)=>{
+
+e.preventDefault();
+
+});
+
+row.addEventListener("drop",async()=>{
+
+if(draggedRow===row)return;
+
+const tbody=document.getElementById("tableBody");
+
+tbody.insertBefore(draggedRow,row);
+
+await saveOrder();
+
+});
+
+});
+
+}
+
+
+        
+/* Enable dragging only for admins */
+
+if(isAdmin){
+
+const rows = document.querySelectorAll("#tableBody tr");
+
+rows.forEach(row=>{
+
+row.addEventListener("dragstart",()=>{
+
+draggedRow = row;
+
+row.classList.add("dragging");
+
+});
+
+row.addEventListener("dragend",()=>{
+
+row.classList.remove("dragging");
+
+});
+
+row.addEventListener("dragover",(e)=>{
+
+e.preventDefault();
+
+});
+
+row.addEventListener("drop",async()=>{
+
+if(draggedRow===row) return;
+
+tbody.insertBefore(draggedRow,row);
+
+await saveOrder();
+
+});
+
+});
+
+}
+
+}
+
+
+    
+
+
+
+
+
+
+    async function saveOrder(){
+
+const rows = document.querySelectorAll("#tableBody tr");
+
+const batch = writeBatch(db);
+
+rows.forEach((row,index)=>{
+
+const id = row.dataset.id;
+
+batch.update(
+doc(db,"tiles",id),
+{
+order:index
+}
+);
+
+});
+
+await batch.commit();
+
 }
 
 
 
 
-
-
+    
 
   window.adminLogin = function(){
 
@@ -483,7 +640,7 @@ document.getElementById("saveBtn").style.display="inline-block";
     document.getElementById("adminPanel").style.display = "block";
     
 isAdmin = true;
-
+document.getElementById("dragHead").style.display="";
 alert("Admin Mode Enabled");
 
 loadTiles();
@@ -507,6 +664,7 @@ alert("Wrong Password");
     window.adminLogout=function(){
 
 isAdmin=false;
+        document.getElementById("dragHead").style.display="none";
 document.getElementById("saveBtn").style.display="none";
         document.getElementById("adminPanel").style.display="none";
  
@@ -551,17 +709,16 @@ editId=null;
 }else{
 
 
-    
-await addDoc(collection(db,"tiles"),{
+    await addDoc(collection(db,"tiles"),{
 
 name,
 size,
 design,
 boxes:Number(boxes),
-lastUpdated: new Date().toISOString()
+order: Date.now(),
+lastUpdated:new Date().toISOString()
 
 });
-
     
 
 }
