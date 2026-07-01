@@ -119,7 +119,25 @@ color:white;
 
 
 
+.stock-box{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:4px;
+}
 
+.stock-count{
+font-size:18px;
+font-weight:bold;
+color:#007bff;
+}
+
+.stock-time{
+font-size:11px;
+color:#777;
+}
+
+    
     #adminPanel{
 display:none;
 }
@@ -192,22 +210,15 @@ onkeyup="searchTile()">
     <div class="table-container">
 
 <table>
-
-<thead>
-
-<tr>
     
+<thead>
 <tr>
 <th>Name</th>
 <th>Size</th>
 <th>Design</th>
 <th>Boxes</th>
-<th>Last Updated</th>
 <th>Action</th>
 </tr>
-
-</tr>
-
 </thead>
 
 <tbody id="tableBody">
@@ -309,24 +320,40 @@ snap.forEach(d=>{
 
 const data=d.data();
     
-const updated = data.lastUpdated
-? new Date(data.lastUpdated).toLocaleString("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  })
-: "Not Available";
+
+    
     
 tbody.innerHTML+=`
 
 <tr>
-<td>${updated}</td>
 <td>${data.name}</td>
 <td>${data.size}</td>
 <td>${data.design}</td>
-<td>${data.boxes}</td>
+
+<td>
+<div class="stock-box">
+<div class="stock-count">
+📦 ${data.boxes}
+</div>
+
+<div class="stock-time">
+🕒 ${
+data.lastUpdated
+? new Date(data.lastUpdated).toLocaleString("en-GB",{
+day:"numeric",
+month:"short",
+year:"numeric",
+hour:"2-digit",
+minute:"2-digit"
+})
+: "Not Available"
+}
+</div>
+</div>
+</td>
+
+
+
 
 
 
