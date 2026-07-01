@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tile Shop Inventory v3</title>
+<title>Tile Shop Inventory v4</title>
 
 <style>
 *{
@@ -155,6 +155,26 @@ display:none;
 .search{
 margin-bottom:15px;
 }
+
+
+
+    .bottom-buttons{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:15px;
+    margin-top:20px;
+    flex-wrap:wrap;
+}
+
+.bottom-buttons button{
+    min-width:180px;
+}
+
+    
+
+
+    
 </style>
 </head>
 
@@ -168,14 +188,7 @@ margin-bottom:15px;
 
    <h1>Tile Shop Inventory</h1>
 
-<!-- Always visible -->
-<button onclick="adminLogin()" id="adminBtn">
-🔐 Admin Panel
-</button>
-
-<button onclick="refreshData()" class="refresh">
-🔄 Refresh Stock
-</button>
+    
 
 <!-- Hidden until admin logs in -->
 <div id="adminPanel" class="card" style="display:none;">
@@ -231,17 +244,40 @@ onkeyup="searchTile()">
 
 </tbody>
 
-</table>
+
+
+
+
+
+
+
+    </table>
 
 </div>
 
+</div>
 
-    
+<div class="bottom-buttons">
+
+    <button onclick="adminLogin()" id="adminBtn">
+        🔐 Admin Panel
+    </button>
+
+    <button onclick="refreshData()" class="refresh">
+        🔄 Refresh Stock
+    </button>
+
 </div>
 
 </div>
 
 <script type="module">
+
+
+
+
+
+    
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
