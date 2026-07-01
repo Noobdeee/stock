@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T.S.I. v5.30</title>
+<title>T.S.I. v5.40</title>
 
 <style>
 *{
@@ -327,24 +327,19 @@ onkeyup="searchTile()">
     
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import {
-
+    import {
 getFirestore,
-
 collection,
-
 addDoc,
-
 getDocs,
-
 deleteDoc,
-
 doc,
 updateDoc,
 query,
 orderBy,
-writeBatch
-
+writeBatch,
+where,
+limit
 } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 /* PASTE YOUR FIREBASE CONFIG HERE */
@@ -693,6 +688,31 @@ alert("Please fill all fields");
 return;
 }
 
+
+        // Prevent duplicate tile (same name + same size)
+if(!editId){
+
+const duplicateQuery = query(
+    collection(db,"tiles"),
+    where("name","==",name),
+    where("size","==",size),
+    limit(1)
+);
+
+const duplicateSnap = await getDocs(duplicateQuery);
+
+if(!duplicateSnap.empty){
+
+alert("❌ This tile is already available in the inventory.");
+
+return;
+
+}
+
+}
+
+        
+        
 if(editId){
 
 await updateDoc(doc(db,"tiles",editId),{
