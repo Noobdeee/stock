@@ -196,13 +196,15 @@ onkeyup="searchTile()">
 <thead>
 
 <tr>
-
+    
+<tr>
 <th>Name</th>
 <th>Size</th>
 <th>Design</th>
-
 <th>Boxes</th>
+<th>Last Updated</th>
 <th>Action</th>
+</tr>
 
 </tr>
 
@@ -306,10 +308,21 @@ const snap=await getDocs(collection(db,"tiles"));
 snap.forEach(d=>{
 
 const data=d.data();
-
+    
+const updated = data.lastUpdated
+? new Date(data.lastUpdated).toLocaleString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  })
+: "Not Available";
+    
 tbody.innerHTML+=`
 
 <tr>
+<td>${updated}</td>
 <td>${data.name}</td>
 <td>${data.size}</td>
 <td>${data.design}</td>
@@ -426,7 +439,8 @@ await updateDoc(doc(db,"tiles",editId),{
 name,
 size,
 design,
-boxes:Number(boxes)
+boxes:Number(boxes),
+lastUpdated: new Date().toISOString()
 
 });
 
@@ -435,12 +449,14 @@ editId=null;
 }else{
 
 
+    
 await addDoc(collection(db,"tiles"),{
 
 name,
 size,
 design,
-boxes:Number(boxes)
+boxes:Number(boxes),
+lastUpdated: new Date().toISOString()
 
 });
 
