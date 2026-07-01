@@ -251,8 +251,7 @@ btn.disabled = true;
 btn.innerHTML = "Refreshing...";
 
        
-       tbody.innerHTML = "";
-await loadTiles();
+  await loadTiles();
 
        
 btn.disabled = false;
@@ -341,14 +340,14 @@ Delete
 
 
 
-    window.adminLogin = function(){
-document.getElementById("saveBtn").style.display="inline-block";
+  window.adminLogin = function(){
+
 const pass = prompt("Enter Admin Password");
 
 if(pass === null) return;
 
 if(pass === ADMIN_PASSWORD){
-
+document.getElementById("saveBtn").style.display="inline-block";
 isAdmin = true;
 
 alert("Admin Mode Enabled");
@@ -431,7 +430,6 @@ boxes:Number(boxes)
 document.getElementById("name").value="";
 document.getElementById("size").value="";
 document.getElementById("design").value="";
-document.getElementById("company").value="";
 document.getElementById("boxes").value="";
 
         
