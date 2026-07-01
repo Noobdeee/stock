@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T.S.I. v5.50</title>
+<title>T.S.I. v5.6</title>
 
 <style>
 *{
@@ -760,6 +760,8 @@ const duplicateSnap = await getDocs(duplicateQuery);
 
 if(!duplicateSnap.empty){
 
+console.log("Duplicate found: ", duplicateSnap.docs[0].data());
+
 alert("❌ This tile is already available in the inventory.");
 
 return;
@@ -787,12 +789,15 @@ editId=null;
 }else{
 
 
-    await addDoc(collection(db,"tiles"),{
+const count = snap.size;
+
+await addDoc(collection(db,"tiles"),{
 
 name,
 size,
 design,
 boxes:Number(boxes),
+order: count,
 createdAt: new Date().toISOString(),
 lastUpdated: new Date().toISOString()
 
