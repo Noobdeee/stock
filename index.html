@@ -147,8 +147,8 @@ margin-bottom:15px;
 </button>
 
 <!-- Hidden until admin logs in -->
-<div id="adminPanel" class="card">
-
+<div id="adminPanel" class="card" style="display:none;">
+    
 <input id="name" placeholder="Tile Name">
 
 <input id="size" placeholder="Size">
@@ -387,6 +387,7 @@ alert("Wrong Password");
 isAdmin=false;
 document.getElementById("saveBtn").style.display="none";
         document.getElementById("adminPanel").style.display="none";
+  
 loadTiles();
 
 document.getElementById("adminBtn").innerHTML="🔐 Admin Panel";
@@ -510,9 +511,18 @@ row.style.display=row.innerText
 
 
 
-    
+    if(isAdmin){
 
-document.getElementById("adminPanel").style.display="none";
+    document.getElementById("adminPanel").style.display = "block";
+
+    document.getElementById("adminBtn").innerHTML = "🚪 Logout";
+    document.getElementById("adminBtn").onclick = adminLogout;
+
+}
+
+loadTiles();
+
+
     
     // Hide the admin panel when the page first loads
 document.getElementById("adminPanel").style.display = "none";
