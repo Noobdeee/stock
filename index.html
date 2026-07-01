@@ -2,296 +2,370 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tile Shop Inventory</title>
 
 <style>
 *{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
 }
 
 body{
-    background:#f4f4f4;
-    padding:20px;
+background:#f5f5f5;
+padding:20px;
 }
 
 .container{
-    max-width:1100px;
-    margin:auto;
-    background:white;
-    padding:20px;
-    border-radius:10px;
-    box-shadow:0 5px 15px rgba(0,0,0,.15);
+max-width:1200px;
+margin:auto;
 }
 
 h1{
-    text-align:center;
-    margin-bottom:20px;
+text-align:center;
+margin-bottom:20px;
+color:#333;
 }
 
-.form{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-    gap:10px;
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 3px 10px rgba(0,0,0,.15);
+margin-bottom:20px;
 }
 
 input{
-    padding:10px;
-    border:1px solid #ccc;
-    border-radius:6px;
+width:100%;
+padding:10px;
+margin-top:10px;
+border:1px solid #ccc;
+border-radius:5px;
 }
 
 button{
-    padding:10px;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    color:white;
-    font-weight:bold;
+padding:10px 18px;
+margin-top:12px;
+background:#007bff;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
 }
 
-.addBtn{
-    background:#007bff;
-}
-
-.editBtn{
-    background:#28a745;
-}
-
-.deleteBtn{
-    background:#dc3545;
-}
-
-.search{
-    margin:20px 0;
-}
-
-.search input{
-    width:100%;
+button:hover{
+background:#0056b3;
 }
 
 table{
-    width:100%;
-    border-collapse:collapse;
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:white;
+}
+
+th,td{
+padding:10px;
+border:1px solid #ddd;
+text-align:center;
 }
 
 th{
-    background:#007bff;
-    color:white;
-    padding:12px;
+background:#007bff;
+color:white;
 }
 
-td{
-    border-bottom:1px solid #ddd;
-    padding:10px;
-    text-align:center;
+.edit{
+background:orange;
 }
 
-tr:hover{
-    background:#f2f2f2;
+.delete{
+background:red;
 }
 
-.total{
-    margin:15px 0;
-    font-size:18px;
-    font-weight:bold;
-}
-
-@media(max-width:700px){
-table{
-display:block;
-overflow-x:auto;
-}
+.search{
+margin-bottom:15px;
 }
 </style>
-
 </head>
+
 <body>
 
 <div class="container">
 
-<h1>🏪 Tile Shop Inventory</h1>
+<h1>Tile Shop Inventory</h1>
 
-<div class="form">
+<div class="card">
+
 <input id="name" placeholder="Tile Name">
-<input id="size" placeholder="Size">
-<input id="brand" placeholder="Brand">
-<input id="stock" type="number" placeholder="Boxes">
-<button class="addBtn" onclick="addItem()">Add Tile</button>
+
+<input id="size" placeholder="Size (2x2,12x18...)">
+
+<input id="design" placeholder="Design Number">
+
+<input id="company" placeholder="Company">
+
+<input id="boxes" type="number" placeholder="Boxes">
+
+<button onclick="saveTile()">Save Tile</button>
+
 </div>
 
-<div class="search">
-<input id="search" placeholder="Search..." onkeyup="searchItem()">
-</div>
+<div class="card">
 
-<div class="total">
-Total Boxes :
-<span id="total">0</span>
-</div>
+<input
+class="search"
+id="search"
+placeholder="Search..."
+onkeyup="searchTile()">
 
 <table>
 
 <thead>
+
 <tr>
-<th>Tile Name</th>
+
+<th>Name</th>
+
 <th>Size</th>
-<th>Brand</th>
+
+<th>Design</th>
+
+<th>Company</th>
+
 <th>Boxes</th>
-<th>Actions</th>
+
+<th>Action</th>
+
 </tr>
+
 </thead>
 
-<tbody id="tableBody"></tbody>
+<tbody id="tableBody">
+
+</tbody>
 
 </table>
 
 </div>
 
-<script>
+</div>
 
-let inventory=JSON.parse(localStorage.getItem("inventory"))||[];
+<script type="module">
 
-function save(){
-localStorage.setItem("inventory",JSON.stringify(inventory));
-render();
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
-function addItem(){
+import {
 
-let name=document.getElementById("name").value.trim();
-let size=document.getElementById("size").value.trim();
-let brand=document.getElementById("brand").value.trim();
-let stock=parseInt(document.getElementById("stock").value);
+getFirestore,
 
-if(name==""||size==""||brand==""||isNaN(stock)){
-alert("Fill all fields");
-return;
-}
+collection,
 
-inventory.push({
-name,
-size,
-brand,
-stock
-});
+addDoc,
 
-document.getElementById("name").value="";
-document.getElementById("size").value="";
-document.getElementById("brand").value="";
-document.getElementById("stock").value="";
+getDocs,
 
-save();
+deleteDoc,
 
-}
+doc,
 
-function render(){
+updateDoc
 
-let body=document.getElementById("tableBody");
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
-body.innerHTML="";
+/* PASTE YOUR FIREBASE CONFIG HERE */
 
-let total=0;
 
-inventory.forEach((item,index)=>{
 
-total+=Number(item.stock);
 
-body.innerHTML+=`
+    const firebaseConfig = {
+  apiKey: "AIzaSyA6F4ecDn0R_Gf2fMzRTwnEZdp9ENW6qr0",
+  authDomain: "shop-stock-bec19.firebaseapp.com",
+  projectId: "shop-stock-bec19",
+  storageBucket: "shop-stock-bec19.firebasestorage.app",
+  messagingSenderId: "849581924489",
+  appId: "1:849581924489:web:d4ee4166f7ae7df89fe658"
+};
+
+
+
+    
+
+const app=initializeApp(firebaseConfig);
+
+const db=getFirestore(app);
+
+let editId=null;
+
+async function loadTiles(){
+
+const tbody=document.getElementById("tableBody");
+
+tbody.innerHTML="";
+
+const snap=await getDocs(collection(db,"tiles"));
+
+snap.forEach(d=>{
+
+const data=d.data();
+
+tbody.innerHTML+=`
+
 <tr>
 
-<td>${item.name}</td>
+<td>${data.name}</td>
 
-<td>${item.size}</td>
+<td>${data.size}</td>
 
-<td>${item.brand}</td>
+<td>${data.design}</td>
 
-<td>${item.stock}</td>
+<td>${data.company}</td>
+
+<td>${data.boxes}</td>
 
 <td>
 
-<button class="editBtn" onclick="editItem(${index})">
+<button class="edit"
+
+onclick="editTile('${d.id}','${data.name}','${data.size}','${data.design}','${data.company}','${data.boxes}')">
+
 Edit
+
 </button>
 
-<button class="deleteBtn" onclick="deleteItem(${index})">
+<button
+
+class="delete"
+
+onclick="deleteTile('${d.id}')">
+
 Delete
+
 </button>
 
 </td>
 
 </tr>
+
 `;
 
 });
 
-document.getElementById("total").innerText=total;
+
+
+
+
+
+    window.saveTile=async function(){
+
+const name=document.getElementById("name").value.trim();
+const size=document.getElementById("size").value.trim();
+const design=document.getElementById("design").value.trim();
+const company=document.getElementById("company").value.trim();
+const boxes=document.getElementById("boxes").value.trim();
+
+if(!name||!size||!design||!company||!boxes){
+alert("Please fill all fields");
+return;
+}
+
+if(editId){
+
+await updateDoc(doc(db,"tiles",editId),{
+
+name,
+size,
+design,
+company,
+boxes:Number(boxes)
+
+});
+
+editId=null;
+
+}else{
+
+await addDoc(collection(db,"tiles"),{
+
+name,
+size,
+design,
+company,
+boxes:Number(boxes)
+
+});
 
 }
 
-function deleteItem(index){
+document.getElementById("name").value="";
+document.getElementById("size").value="";
+document.getElementById("design").value="";
+document.getElementById("company").value="";
+document.getElementById("boxes").value="";
 
-if(confirm("Delete this item?")){
-
-inventory.splice(index,1);
-
-save();
-
-}
+loadTiles();
 
 }
 
-function editItem(index){
+window.editTile=function(id,name,size,design,company,boxes){
 
-let item=inventory[index];
+editId=id;
 
-let name=prompt("Tile Name",item.name);
+document.getElementById("name").value=name;
+document.getElementById("size").value=size;
+document.getElementById("design").value=design;
+document.getElementById("company").value=company;
+document.getElementById("boxes").value=boxes;
 
-if(name===null)return;
-
-let size=prompt("Size",item.size);
-
-if(size===null)return;
-
-let brand=prompt("Brand",item.brand);
-
-if(brand===null)return;
-
-let stock=prompt("Boxes",item.stock);
-
-if(stock===null)return;
-
-inventory[index]={
-name:name,
-size:size,
-brand:brand,
-stock:Number(stock)
-};
-
-save();
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
 
 }
 
-function searchItem(){
+window.deleteTile=async function(id){
 
-let value=document.getElementById("search").value.toLowerCase();
+if(!confirm("Delete this tile?"))
+return;
+
+await deleteDoc(doc(db,"tiles",id));
+
+loadTiles();
+
+}
+
+window.searchTile=function(){
+
+let filter=document.getElementById("search")
+.value
+.toLowerCase();
 
 let rows=document.querySelectorAll("#tableBody tr");
 
 rows.forEach(row=>{
 
-row.style.display=row.innerText.toLowerCase().includes(value)
-?"":"none";
+row.style.display=row.innerText
+.toLowerCase()
+.includes(filter)
+? ""
+: "none";
 
 });
 
 }
 
-render();
+
+
+
+    loadTiles();
 
 </script>
 
 </body>
 </html>
+}
+
+window.loadTiles=loadTiles;
