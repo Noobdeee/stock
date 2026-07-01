@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T.S.I. v5.40</title>
+<title>T.S.I. v5.50</title>
 
 <style>
 *{
@@ -215,6 +215,44 @@ margin-bottom:15px;
     border-top:4px solid #007bff;
 }
 
+
+
+
+
+    .new-badge{
+display:inline-block;
+margin-left:8px;
+padding:2px 8px;
+background:#2ecc71;
+color:#000;
+font-size:10px;
+font-weight:bold;
+border-radius:999px;
+text-transform:uppercase;
+vertical-align:middle;
+box-shadow:0 1px 4px rgba(0,0,0,.15);
+animation:newPulse 1.5s infinite;
+}
+
+@keyframes newPulse{
+
+0%{
+transform:scale(1);
+}
+
+50%{
+transform:scale(1.08);
+}
+
+100%{
+transform:scale(1);
+}
+
+}
+
+
+
+
     
 </style>
 </head>
@@ -415,6 +453,10 @@ const data = d.data();
 
 totalBoxes += parseInt(data.boxes) || 0;
 
+    const isNew =
+data.createdAt &&
+(Date.now() - new Date(data.createdAt).getTime()) < (24 * 60 * 60 * 1000);
+    
 tbody.innerHTML += `
 
 <tr data-id="${d.id}" ${isAdmin ? 'draggable="true"' : ''}>
@@ -433,7 +475,22 @@ isAdmin
 }
 
 
-<td>${data.name}</td>
+
+<td>
+
+${data.name}
+
+${
+isNew
+?
+`<span class="new-badge">NEW</span>`
+:
+""
+}
+
+</td>
+
+
 
 <td>${data.size}</td>
 
@@ -736,8 +793,8 @@ name,
 size,
 design,
 boxes:Number(boxes),
-order: Date.now(),
-lastUpdated:new Date().toISOString()
+createdAt: new Date().toISOString(),
+lastUpdated: new Date().toISOString()
 
 });
     
