@@ -133,32 +133,42 @@ margin-bottom:15px;
 
 <h1>Tile Shop Inventory</h1>
 
-<div class="card">
 
-<input id="name" placeholder="Tile Name">
 
-<input id="size" placeholder="Size (2x2,12x18...)">
-
-<input id="design" placeholder="Design Number">
 
     
-<input id="boxes" type="number" placeholder="Boxes">
-    
-<button id="saveBtn" onclick="saveTile()">
-Save Tile
-</button>
-    
-    <button onclick="adminLogin()" id="adminBtn">
+<!-- Always visible -->
+<button onclick="adminLogin()" id="adminBtn">
 🔐 Admin Panel
 </button>
-    
+
 <button onclick="refreshData()" class="refresh">
 🔄 Refresh Stock
 </button>
 
-    
+<!-- Hidden until admin logs in -->
+<div id="adminPanel" class="card">
+
+<input id="name" placeholder="Tile Name">
+
+<input id="size" placeholder="Size">
+
+<input id="design" placeholder="Design">
+
+<input id="boxes" type="number" placeholder="Boxes">
+
+<button id="saveBtn" onclick="saveTile()">
+Save Tile
+</button>
+
 </div>
 
+
+
+
+
+
+    
 <div class="card">
 
 <input
@@ -348,6 +358,7 @@ if(pass === null) return;
 
 if(pass === ADMIN_PASSWORD){
 document.getElementById("saveBtn").style.display="inline-block";
+    document.getElementById("adminPanel").style.display="block";
 isAdmin = true;
 
 alert("Admin Mode Enabled");
@@ -374,6 +385,7 @@ alert("Wrong Password");
 
 isAdmin=false;
 document.getElementById("saveBtn").style.display="none";
+        document.getElementById("adminPanel").style.display="none";
 loadTiles();
 
 document.getElementById("adminBtn").innerHTML="🔐 Admin Panel";
@@ -501,6 +513,10 @@ row.style.display=row.innerText
 
 
 document.getElementById("saveBtn").style.display="none";
+
+    // Hide the admin panel when the page first loads
+document.getElementById("adminPanel").style.display = "none";
+
 loadTiles();
 
 </script>
