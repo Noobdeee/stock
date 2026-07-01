@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Tile Shop Inventory</title>
+<title>Tile Shop Inventory v3</title>
 
 <style>
 *{
@@ -118,12 +118,14 @@ color:white;
 
 
 
-
 .stock-box{
-display:flex;
+display:inline-flex;
 flex-direction:column;
 align-items:center;
-gap:4px;
+background:#f8f9fa;
+padding:8px 12px;
+border-radius:10px;
+min-width:110px;
 }
 
 .stock-count{
@@ -133,9 +135,13 @@ color:#007bff;
 }
 
 .stock-time{
+margin-top:4px;
 font-size:11px;
-color:#777;
+color:#666;
+line-height:1.3;
 }
+
+    
 
     
     #adminPanel{
@@ -339,15 +345,18 @@ tbody.innerHTML+=`
 <div class="stock-time">
 🕒 ${
 data.lastUpdated
-? new Date(data.lastUpdated).toLocaleString("en-GB",{
-day:"numeric",
-month:"short",
-year:"numeric",
-hour:"2-digit",
-minute:"2-digit"
+? new Date(data.lastUpdated).toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true
 })
 : "Not Available"
 }
+</div>
+
 </div>
 </div>
 </td>
@@ -496,8 +505,7 @@ document.getElementById("size").value="";
 document.getElementById("design").value="";
 document.getElementById("boxes").value="";
 
-        
-document.getElementById("saveBtn").style.display="none";
+    
 
 loadTiles();
 
@@ -529,7 +537,7 @@ if(!confirm("Delete this tile?"))
 return;
 
 await deleteDoc(doc(db,"tiles",id));
-document.getElementById("saveBtn").style.display="none";
+
 
 loadTiles();
 
