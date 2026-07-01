@@ -143,9 +143,14 @@ margin-bottom:15px;
 
     
 <input id="boxes" type="number" placeholder="Boxes">
-
-<button onclick="saveTile()">Save Tile</button>
-
+    
+<button id="saveBtn" onclick="saveTile()">
+Save Tile
+</button>
+    
+    <button onclick="adminLogin()" id="adminBtn">
+🔐 Admin Panel
+</button>
     
 <button onclick="refreshData()" class="refresh">
 🔄 Refresh Stock
@@ -166,9 +171,7 @@ onkeyup="searchTile()">
 
 
 
-
     
-
     <div class="table-container">
 
 <table>
@@ -265,7 +268,9 @@ const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 
 let editId=null;
+let isAdmin = false;
 
+const ADMIN_PASSWORD = "1234"; // Change this
 
 
 
@@ -294,27 +299,33 @@ tbody.innerHTML+=`
 <td>${data.design}</td>
 <td>${data.boxes}</td>
 
+
+
 <td>
 
+${
+isAdmin ?
+
+`
 <button class="edit"
-
-onclick="editTile('${d.id}','${data.name}','${data.size}','${data.design}','${data.boxes}')"
-
+onclick="editTile('${d.id}','${data.name}','${data.size}','${data.design}','${data.boxes}')">
 Edit
-
 </button>
 
-<button
-
-class="delete"
-
+<button class="delete"
 onclick="deleteTile('${d.id}')">
-
 Delete
-
 </button>
+`
+
+:
+
+`<span style="color:gray;">View Only</span>`
+
+}
 
 </td>
+
 
 </tr>
 
@@ -327,6 +338,55 @@ Delete
 
 
 
+
+
+
+    window.adminLogin = function(){
+document.getElementById("saveBtn").style.display="inline-block";
+const pass = prompt("Enter Admin Password");
+
+if(pass === null) return;
+
+if(pass === ADMIN_PASSWORD){
+
+isAdmin = true;
+
+alert("Admin Mode Enabled");
+
+loadTiles();
+
+document.getElementById("adminBtn").innerHTML="🚪 Logout";
+
+document.getElementById("adminBtn").onclick=adminLogout;
+
+}else{
+
+alert("Wrong Password");
+
+}
+
+}
+
+
+
+
+
+    window.adminLogout=function(){
+
+isAdmin=false;
+document.getElementById("saveBtn").style.display="none";
+loadTiles();
+
+document.getElementById("adminBtn").innerHTML="🔐 Admin Panel";
+
+document.getElementById("adminBtn").onclick=adminLogin;
+
+}
+
+
+
+
+    
     window.saveTile=async function(){
 
 const name=document.getElementById("name").value.trim();
@@ -374,6 +434,9 @@ document.getElementById("design").value="";
 document.getElementById("company").value="";
 document.getElementById("boxes").value="";
 
+        
+document.getElementById("saveBtn").style.display="none";
+
 loadTiles();
 
 }
@@ -404,6 +467,7 @@ if(!confirm("Delete this tile?"))
 return;
 
 await deleteDoc(doc(db,"tiles",id));
+document.getElementById("saveBtn").style.display="none";
 
 loadTiles();
 
@@ -438,7 +502,7 @@ row.style.display=row.innerText
     
 
 
-
+document.getElementById("saveBtn").style.display="none";
 loadTiles();
 
 </script>
