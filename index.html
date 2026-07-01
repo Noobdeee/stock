@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T.S.I. v5.20</title>
+<title>T.S.I. v5.30</title>
 
 <style>
 *{
@@ -270,17 +270,16 @@ onkeyup="searchTile()">
     <div class="table-container">
 
 <table>
-    
-<thead>
-   <tr>
-<th id="dragHead" style="display:none;">↕</th>
-<th>Name</th>
-<th>Size</th>
-<th>Design</th>
-<th>Boxes</th>
-<th>Action</th>
+
+    <thead>
+<tr>
+    <th id="dragHead" style="display:none;">↕</th>
+    <th>Name</th>
+    <th>Size</th>
+    <th>Design</th>
+    <th>Boxes</th>
+    <th>Action</th>
 </tr>
-    
 </thead>
 
 <tbody id="tableBody">
@@ -425,6 +424,7 @@ tbody.innerHTML += `
 
 <tr data-id="${d.id}" ${isAdmin ? 'draggable="true"' : ''}>
 
+
 ${
 isAdmin
 ?
@@ -434,8 +434,9 @@ isAdmin
 </td>
 `
 :
-`<td></td>`
+``
 }
+
 
 <td>${data.name}</td>
 
