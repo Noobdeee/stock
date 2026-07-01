@@ -141,8 +141,7 @@ margin-bottom:15px;
 
 <input id="design" placeholder="Design Number">
 
-<input id="company" placeholder="Company">
-
+    
 <input id="boxes" type="number" placeholder="Boxes">
 
 <button onclick="saveTile()">Save Tile</button>
@@ -181,7 +180,7 @@ onkeyup="searchTile()">
 <th>Name</th>
 <th>Size</th>
 <th>Design</th>
-<th>Company</th>
+
 <th>Boxes</th>
 <th>Action</th>
 
@@ -290,22 +289,16 @@ const data=d.data();
 tbody.innerHTML+=`
 
 <tr>
-
 <td>${data.name}</td>
-
 <td>${data.size}</td>
-
 <td>${data.design}</td>
-
-<td>${data.company}</td>
-
 <td>${data.boxes}</td>
 
 <td>
 
 <button class="edit"
 
-onclick="editTile('${d.id}','${data.name}','${data.size}','${data.design}','${data.company}','${data.boxes}')">
+onclick="editTile('${d.id}','${data.name}','${data.size}','${data.design}','${data.boxes}')"
 
 Edit
 
@@ -339,10 +332,9 @@ Delete
 const name=document.getElementById("name").value.trim();
 const size=document.getElementById("size").value.trim();
 const design=document.getElementById("design").value.trim();
-const company=document.getElementById("company").value.trim();
 const boxes=document.getElementById("boxes").value.trim();
 
-if(!name||!size||!design||!company||!boxes){
+if(!name||!size||!design||!boxes){
 alert("Please fill all fields");
 return;
 }
@@ -354,7 +346,6 @@ await updateDoc(doc(db,"tiles",editId),{
 name,
 size,
 design,
-company,
 boxes:Number(boxes)
 
 });
@@ -363,15 +354,17 @@ editId=null;
 
 }else{
 
+
 await addDoc(collection(db,"tiles"),{
 
 name,
 size,
 design,
-company,
 boxes:Number(boxes)
 
 });
+
+    
 
 }
 
@@ -385,14 +378,14 @@ loadTiles();
 
 }
 
-window.editTile=function(id,name,size,design,company,boxes){
 
+
+    window.editTile=function(id,name,size,design,boxes){
 editId=id;
 
 document.getElementById("name").value=name;
 document.getElementById("size").value=size;
 document.getElementById("design").value=design;
-document.getElementById("company").value=company;
 document.getElementById("boxes").value=boxes;
 
 window.scrollTo({
@@ -402,6 +395,9 @@ behavior:"smooth"
 
 }
 
+
+
+    
 window.deleteTile=async function(id){
 
 if(!confirm("Delete this tile?"))
