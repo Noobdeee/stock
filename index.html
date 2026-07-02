@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> Tiles Pro v5</title>
+<title> Tiles Pro v5.0</title>
 
 <style>
 *{
@@ -524,9 +524,12 @@ tiles.forEach(data=>{
 
 totalBoxes += parseInt(data.boxes) || 0;
 
-    const isNew =
+const isNew =
+data.isNew === true &&
 data.createdAt &&
 (Date.now() - new Date(data.createdAt).getTime()) < (24 * 60 * 60 * 1000);
+
+    
     
 tbody.innerHTML += `
 
@@ -796,18 +799,21 @@ if (duplicate) {
         
 if(editId){
 
-await updateDoc(doc(db,"tiles",editId),{
+
+    await updateDoc(doc(db,"tiles",editId),{
 
 name,
 size,
 design,
 boxes:Number(boxes),
-lastUpdated: new Date().toISOString()
+lastUpdated:new Date().toISOString(),
+isNew:false
 
 });
+    
 
 editId=null;
-
+document.getElementById("saveBtn").innerText = "Save Tile";
 }else{
 
 const existingTiles = await getDocs(collection(db,"tiles"));
@@ -824,7 +830,8 @@ existingTiles.forEach(doc=>{
 
 });
 
-await addDoc(collection(db,"tiles"),{
+
+    await addDoc(collection(db,"tiles"),{
 
     name,
     size,
@@ -834,9 +841,11 @@ await addDoc(collection(db,"tiles"),{
     order:maxOrder + 1,
 
     createdAt:new Date().toISOString(),
-    lastUpdated:new Date().toISOString()
+    lastUpdated:new Date().toISOString(),
+    isNew:true
 
 });
+    
 
 }
 
@@ -851,15 +860,16 @@ document.getElementById("boxes").value="";
 
     
 
-loadTiles();
 
+await loadTiles();
+alert(editId ? "✅ Tile updated." : "✅ Tile added.");
 }
 
 
 
     window.editTile=function(id,name,size,design,boxes){
 editId=id;
-
+document.getElementById("saveBtn").innerText = "Update Tile";
 document.getElementById("name").value=name;
 document.getElementById("size").value=size;
 document.getElementById("design").value=design;
