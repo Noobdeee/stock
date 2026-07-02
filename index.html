@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T.S.I. v5.6</title>
+<title>T.S.I. v5.7 </title>
 
 <style>
 *{
@@ -440,16 +440,42 @@ const tbody = document.getElementById("tableBody");
 tbody.innerHTML = "";
 let totalBoxes = 0;
 
-const q = query(
-    collection(db,"tiles"),
-    orderBy("order")
-);
 
-const snap = await getDocs(q);
 
-snap.forEach(d=>{
 
-const data = d.data();
+        const snap = await getDocs(collection(db,"tiles"));
+
+let tiles = [];
+
+snap.forEach(d => {
+
+    const data = d.data();
+
+    tiles.push({
+        id: d.id,
+        ...data,
+       order: data.order ?? tiles.length,      // Default order for old items
+        boxes: data.boxes ?? 0,           // Default stock
+        name: data.name ?? "Unknown",
+        size: data.size ?? "-",
+        design: data.design ?? "-",
+        createdAt: data.createdAt ?? null,
+        lastUpdated: data.lastUpdated ?? null
+    });
+
+});
+
+// Sort by order
+tiles.sort((a, b) => a.order - b.order);
+
+
+
+        
+
+
+        
+
+tiles.forEach(data=>{
 
 totalBoxes += parseInt(data.boxes) || 0;
 
@@ -459,7 +485,7 @@ data.createdAt &&
     
 tbody.innerHTML += `
 
-<tr data-id="${d.id}" ${isAdmin ? 'draggable="true"' : ''}>
+<tr data-id="${data.id}" ${isAdmin ? 'draggable="true"' : ''}>
 
 
 ${
@@ -532,12 +558,12 @@ isAdmin ?
 
 `
 <button class="edit"
-onclick="editTile('${d.id}','${data.name}','${data.size}','${data.design}','${data.boxes}')">
+onclick="editTile('${data.id}','${data.name}','${data.size}','${data.design}','${data.boxes}')">
 Edit
 </button>
 
 <button class="delete"
-onclick="deleteTile('${d.id}')">
+onclick="deleteTile('${data.id}')">
 Delete
 </button>
 `
@@ -602,47 +628,7 @@ await saveOrder();
 
 
         
-/* Enable dragging only for admins */
 
-if(isAdmin){
-
-const rows = document.querySelectorAll("#tableBody tr");
-
-rows.forEach(row=>{
-
-row.addEventListener("dragstart",()=>{
-
-draggedRow = row;
-
-row.classList.add("dragging");
-
-});
-
-row.addEventListener("dragend",()=>{
-
-row.classList.remove("dragging");
-
-});
-
-row.addEventListener("dragover",(e)=>{
-
-e.preventDefault();
-
-});
-
-row.addEventListener("drop",async()=>{
-
-if(draggedRow===row) return;
-
-tbody.insertBefore(draggedRow,row);
-
-await saveOrder();
-
-});
-
-});
-
-}
 
 }
 
@@ -735,8 +721,9 @@ document.getElementById("adminBtn").onclick=adminLogin;
     
     window.saveTile=async function(){
 
-const name=document.getElementById("name").value.trim();
-const size=document.getElementById("size").value.trim();
+        const name = document.getElementById("name").value.trim().toUpperCase();
+const size = document.getElementById("size").value.trim().toLowerCase();
+        
 const design=document.getElementById("design").value.trim();
 const boxes=document.getElementById("boxes").value.trim();
 
@@ -750,22 +737,19 @@ return;
 if(!editId){
 
 const duplicateQuery = query(
-    collection(db,"tiles"),
-    where("name","==",name),
-    where("size","==",size),
-    limit(1)
+    collection(db, "tiles"),
+    where("name", "==", name),
+    where("size", "==", size)
 );
 
 const duplicateSnap = await getDocs(duplicateQuery);
 
-if(!duplicateSnap.empty){
+// Ignore the current tile while editing
+const duplicate = duplicateSnap.docs.find(doc => doc.id !== editId);
 
-console.log("Duplicate found: ", duplicateSnap.docs[0].data());
-
-alert("❌ This tile is already available in the inventory.");
-
-return;
-
+if (duplicate) {
+    alert("❌ This tile is already available in the inventory.");
+    return;
 }
 
 }
@@ -788,24 +772,40 @@ editId=null;
 
 }else{
 
+const existingTiles = await getDocs(collection(db,"tiles"));
 
-const count = snap.size;
+let maxOrder = -1;
+
+existingTiles.forEach(doc=>{
+
+    const o = doc.data().order;
+
+    if(typeof o === "number" && o > maxOrder){
+        maxOrder = o;
+    }
+
+});
 
 await addDoc(collection(db,"tiles"),{
 
-name,
-size,
-design,
-boxes:Number(boxes),
-order: count,
-createdAt: new Date().toISOString(),
-lastUpdated: new Date().toISOString()
+    name,
+    size,
+    design,
+    boxes:Number(boxes),
+
+    order:maxOrder + 1,
+
+    createdAt:new Date().toISOString(),
+    lastUpdated:new Date().toISOString()
 
 });
-    
 
 }
 
+
+
+
+        
 document.getElementById("name").value="";
 document.getElementById("size").value="";
 document.getElementById("design").value="";
