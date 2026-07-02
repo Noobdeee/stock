@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>T.S.I. v5.7 </title>
+<title> Tiles Pro v5</title>
 
 <style>
 *{
@@ -265,7 +265,7 @@ transform:scale(1);
 
 
 
-   <h1>Tile Shop Inventory</h1>
+   <h1> TILES PRO STOCK </h1>
 
     
 
@@ -431,6 +431,47 @@ const ADMIN_PASSWORD = "1234"; // Change this
 
 
 
+    function getTimeAgo(dateString){
+
+    const diff = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
+
+    // Less than 2 minutes
+    if(diff < 120){
+        return "🟢 Just Now";
+    }
+
+    // Less than 1 hour
+    if(diff < 3600){
+
+        const mins = Math.floor(diff / 60);
+
+        return `🕒 ${mins} Minute${mins > 1 ? "s" : ""} Ago`;
+    }
+
+    // Less than 24 hours
+    if(diff < 86400){
+
+        const hrs = Math.floor(diff / 3600);
+
+        return `🕒 ${hrs} Hour${hrs > 1 ? "s" : ""} Ago`;
+    }
+
+    // 1 day or more
+    const days = Math.floor(diff / 86400);
+
+    return `🕒 ${days} Day${days > 1 ? "s" : ""} Ago`;
+
+}
+
+
+
+
+
+
+
+    
+
+
 
 
     async function loadTiles(){
@@ -441,6 +482,10 @@ tbody.innerHTML = "";
 let totalBoxes = 0;
 
 
+
+
+
+        
 
 
         const snap = await getDocs(collection(db,"tiles"));
@@ -532,16 +577,9 @@ isNew
 
 <div class="stock-time">
 
-🕒 ${
+${
 data.lastUpdated
-? new Date(data.lastUpdated).toLocaleString("en-GB",{
-day:"numeric",
-month:"short",
-year:"numeric",
-hour:"numeric",
-minute:"2-digit",
-hour12:true
-})
+? getTimeAgo(data.lastUpdated)
 : "Not Available"
 }
 
