@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> Tiles Pro v5.0.5</title>
+<title> Tiles Pro v5.0.8 fixing drag and drop for phone</title> 
 
 <style>
 *{
@@ -203,11 +203,13 @@ margin-bottom:15px;
     text-align:center;
 }
 
-.drag-handle{
+    .drag-handle{
     cursor:grab;
-    font-size:22px;
+    font-size:24px;
     user-select:none;
+    touch-action:none;
 }
+    
 
 .dragging{
     opacity:.45;
@@ -760,38 +762,73 @@ Delete
 document.getElementById("totalBoxes").innerText = totalBoxes;
 
 
-        if(isAdmin){
+    
 
-const rows=document.querySelectorAll("#tableBody tr");
+    if(isAdmin){
 
+const rows = document.querySelectorAll("#tableBody tr");
+
+// Desktop
 rows.forEach(row=>{
 
+row.draggable = true;
+
 row.addEventListener("dragstart",()=>{
-
-draggedRow=row;
+draggedRow = row;
 row.classList.add("dragging");
-
 });
 
 row.addEventListener("dragend",()=>{
-
 row.classList.remove("dragging");
-
 });
 
 row.addEventListener("dragover",(e)=>{
-
 e.preventDefault();
-
 });
 
 row.addEventListener("drop",async()=>{
 
-if(draggedRow===row)return;
+if(draggedRow===row) return;
 
-const tbody=document.getElementById("tableBody");
+row.parentNode.insertBefore(draggedRow,row);
 
-tbody.insertBefore(draggedRow,row);
+await saveOrder();
+
+});
+
+// Mobile
+row.addEventListener("touchstart",()=>{
+draggedRow = row;
+row.classList.add("dragging");
+});
+
+row.addEventListener("touchmove",(e)=>{
+
+e.preventDefault();
+
+const touch = e.touches[0];
+
+const target = document.elementFromPoint(
+touch.clientX,
+touch.clientY
+);
+
+const targetRow = target?.closest("tr");
+
+if(targetRow && targetRow!==draggedRow){
+
+targetRow.parentNode.insertBefore(
+draggedRow,
+targetRow
+);
+
+}
+
+},{passive:false});
+
+row.addEventListener("touchend",async()=>{
+
+row.classList.remove("dragging");
 
 await saveOrder();
 
