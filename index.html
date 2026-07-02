@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> Tiles Pro v5.0.3</title>
+<title> Tiles Pro v5.0.4</title>
 
 <style>
 *{
@@ -347,6 +347,23 @@ td:nth-child(4){
 
 
 
+    .design-box{
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:4px;
+}
+
+.design-text{
+font-size:16px;
+font-weight:bold;
+}
+
+
+
+
+
+
     
 
     
@@ -642,11 +659,22 @@ ${isAdmin ? `
 ` : ""}
 
 
+<td>
+<span style="font-size:16px;font-weight:bold;">
+${data.size}
+</span>
+</td>
 
-<td>${data.size}</td>
+
+
 
 <td>
+
+<div class="design-box">
+
+<div class="design-text">
 ${data.design}
+</div>
 
 ${
 isNew
@@ -655,7 +683,14 @@ isNew
 :
 ""
 }
+
+</div>
+
 </td>
+
+
+
+
 
 
 <td>
