@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> Tiles Pro v5.0</title>
+<title> Tiles Pro v5.0.1</title>
 
 <style>
 *{
@@ -431,38 +431,40 @@ const ADMIN_PASSWORD = "1234"; // Change this
 
 
 
-    function getTimeAgo(dateString){
+ function getTimeAgo(dateString){
 
     const diff = Math.floor((Date.now() - new Date(dateString).getTime()) / 1000);
 
-    // Less than 2 minutes
+    // 0-2 minutes
     if(diff < 120){
         return "🟢 Just Now";
     }
 
     // Less than 1 hour
     if(diff < 3600){
-
         const mins = Math.floor(diff / 60);
-
         return `🕒 ${mins} Minute${mins > 1 ? "s" : ""} Ago`;
     }
 
     // Less than 24 hours
     if(diff < 86400){
-
         const hrs = Math.floor(diff / 3600);
-
         return `🕒 ${hrs} Hour${hrs > 1 ? "s" : ""} Ago`;
     }
 
-    // 1 day or more
+    // Yesterday (24-48 hours)
+    if(diff < 172800){
+        return "🕒 Yesterday";
+    }
+
+    // More than 2 days
     const days = Math.floor(diff / 86400);
-
-    return `🕒 ${days} Day${days > 1 ? "s" : ""} Ago`;
-
+    return `🕒 ${days} Days Ago`;
 }
 
+
+
+    
 
 
 
