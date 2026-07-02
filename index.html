@@ -203,11 +203,14 @@ margin-bottom:15px;
     text-align:center;
 }
 
+
     .drag-handle{
     cursor:grab;
-    font-size:24px;
+    font-size:28px;
     user-select:none;
     touch-action:none;
+    display:inline-block;
+    padding:12px;
 }
     
 
@@ -239,6 +242,14 @@ box-shadow:0 1px 4px rgba(0,0,0,.15);
 animation:newPulse 1.5s infinite;
 }
 
+
+
+
+   .table-container{
+    touch-action:auto;
+}
+
+    
 @keyframes newPulse{
 
 0%{
@@ -387,6 +398,12 @@ font-weight:bold;
 </style>
 </head>
 
+
+
+  
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    
 <body>
 
 <div class="container">
@@ -547,7 +564,7 @@ btn.innerHTML = "🔄 Refresh Stock";
 const app=initializeApp(firebaseConfig);
 
 const db=getFirestore(app);
-
+let sortable = null;
 let editId=null;
 let isAdmin = false;
 let draggedRow = null;
@@ -664,8 +681,8 @@ data.createdAt &&
     
 tbody.innerHTML += `
 
-<tr data-id="${data.id}" ${isAdmin ? 'draggable="true"' : ''}>
 
+<tr data-id="${data.id}">
 
 
 
@@ -761,82 +778,43 @@ Delete
 
 document.getElementById("totalBoxes").innerText = totalBoxes;
 
+if(isAdmin){
+
+    if(sortable){
+    sortable.destroy();
+}
+
+    sortable = new Sortable(document.getElementById("tableBody"),{
+
+    animation:150,
+    handle:".drag-handle",
+    draggable:"tr",
+
+    ghostClass:"dragging",
+    chosenClass:"dragging",
+
+    delay:150,
+    delayOnTouchOnly:true,
+    touchStartThreshold:5,
+    forceFallback:true,
+
+    onEnd:async()=>{
+        await saveOrder();
+    }
+
+});
+    
+
+}
+        
 
     
 
-    if(isAdmin){
+  
 
-const rows = document.querySelectorAll("#tableBody tr");
-
-// Desktop
-rows.forEach(row=>{
-
-row.draggable = true;
-
-row.addEventListener("dragstart",()=>{
-draggedRow = row;
-row.classList.add("dragging");
-});
-
-row.addEventListener("dragend",()=>{
-row.classList.remove("dragging");
-});
-
-row.addEventListener("dragover",(e)=>{
-e.preventDefault();
-});
-
-row.addEventListener("drop",async()=>{
-
-if(draggedRow===row) return;
-
-row.parentNode.insertBefore(draggedRow,row);
-
-await saveOrder();
-
-});
-
-// Mobile
-row.addEventListener("touchstart",()=>{
-draggedRow = row;
-row.classList.add("dragging");
-});
-
-row.addEventListener("touchmove",(e)=>{
-
-e.preventDefault();
-
-const touch = e.touches[0];
-
-const target = document.elementFromPoint(
-touch.clientX,
-touch.clientY
-);
-
-const targetRow = target?.closest("tr");
-
-if(targetRow && targetRow!==draggedRow){
-
-targetRow.parentNode.insertBefore(
-draggedRow,
-targetRow
-);
-
-}
-
-},{passive:false});
-
-row.addEventListener("touchend",async()=>{
-
-row.classList.remove("dragging");
-
-await saveOrder();
-
-});
-
-});
-
-}
+       
+        
+        
 
 
         
@@ -920,7 +898,13 @@ isAdmin=false;
 document.getElementById("saveBtn").style.display="none";
         document.getElementById("adminPanel").style.display="none";
         document.getElementById("actionHead").style.display="none";
- 
+
+
+        if(sortable){
+    sortable.destroy();
+    sortable = null;
+}
+        
 loadTiles();
 
 document.getElementById("adminBtn").innerHTML="🔐 Admin Panel";
