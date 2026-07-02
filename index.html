@@ -936,7 +936,7 @@ if(!editId){
 
 const duplicateQuery = query(
     collection(db, "tiles"),
-    where("name", "==", name),
+    where("design", "==", design),
     where("size", "==", size)
 );
 
@@ -946,7 +946,7 @@ const duplicateSnap = await getDocs(duplicateQuery);
 const duplicate = duplicateSnap.docs.find(doc => doc.id !== editId);
 
 if (duplicate) {
-    alert("❌ This tile is already available in the inventory.");
+    alert("❌ A tile with this Size & Design already exists.");
     return;
 }
 
