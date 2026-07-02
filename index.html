@@ -418,7 +418,7 @@ onkeyup="searchTile()">
     <th>Size</th>
     <th>Design</th>
     <th>Boxes</th>
-    <th>Action</th>
+    <th id="actionHead" style="display:none;">Action</th>
 </tr>
 </thead>
 
@@ -640,18 +640,13 @@ tbody.innerHTML += `
 <tr data-id="${data.id}" ${isAdmin ? 'draggable="true"' : ''}>
 
 
-${
-isAdmin
-?
-`
+
+
+${isAdmin ? `
 <td class="drag-cell">
     <span class="drag-handle">☰</span>
 </td>
-`
-:
-``
-}
-
+` : ""}
 
 
 <td>
@@ -696,12 +691,11 @@ data.lastUpdated
 
 </td>
 
-<td>
 
-${
-isAdmin ?
 
-`
+
+<td style="${isAdmin ? "" : "display:none;"}">
+
 <button class="edit"
 onclick="editTile('${data.id}','${data.name}','${data.size}','${data.design}','${data.boxes}')">
 Edit
@@ -711,15 +705,12 @@ Edit
 onclick="deleteTile('${data.id}')">
 Delete
 </button>
-`
-
-:
-
-`<span style="color:gray;">View Only</span>`
-
-}
 
 </td>
+
+
+
+
 
 </tr>
 
@@ -825,6 +816,7 @@ document.getElementById("saveBtn").style.display="inline-block";
     
 isAdmin = true;
 document.getElementById("dragHead").style.display="";
+    document.getElementById("actionHead").style.display="";
 alert("Admin Mode Enabled");
 
 loadTiles();
@@ -851,6 +843,7 @@ isAdmin=false;
         document.getElementById("dragHead").style.display="none";
 document.getElementById("saveBtn").style.display="none";
         document.getElementById("adminPanel").style.display="none";
+        document.getElementById("actionHead").style.display="none";
  
 loadTiles();
 
