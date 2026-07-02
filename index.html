@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title> Tiles Pro v5.0.1</title>
+<title> Tiles Pro v5.0.2</title>
 
 <style>
 *{
@@ -79,11 +79,11 @@ border-radius:10px;
 }
 
 table{
-width:100%;
-min-width:700px;
-border-collapse:collapse;
-background:white;
+    width:100%;
+    min-width:unset;
+    table-layout:fixed;
 }
+    
 
 th,td{
 padding:12px;
@@ -252,6 +252,108 @@ transform:scale(1);
 
 
 
+
+
+    @media (max-width:768px){
+
+body{
+    padding:8px;
+}
+
+.card{
+    padding:10px;
+}
+
+th,
+td{
+    padding:6px 4px;
+    font-size:12px;
+}
+
+button{
+    padding:5px 8px;
+    font-size:11px;
+}
+
+.stock-box{
+    min-width:auto;
+    padding:4px 6px;
+}
+
+.stock-count{
+    font-size:14px;
+}
+
+.stock-time{
+    font-size:9px;
+}
+
+}
+
+
+    @media (max-width:768px){
+
+.search{
+    font-size:14px;
+    padding:8px;
+}
+
+}
+
+
+    @media (max-width:768px){
+
+td button{
+    display:block;
+    width:100%;
+    margin:3px 0;
+}
+
+}
+
+
+
+    @media (max-width:768px){
+
+.total-stock{
+    font-size:18px;
+    padding:10px;
+}
+
+.total-stock span{
+    font-size:24px;
+}
+
+}
+
+
+
+
+    th:nth-child(2),
+td:nth-child(2){
+    width:70px;
+}
+
+th:nth-child(3),
+td:nth-child(3){
+    width:55px;
+}
+
+th:nth-child(4),
+td:nth-child(4){
+    width:65px;
+}
+
+th:nth-child(5),
+td:nth-child(5){
+    width:85px;
+}
+
+
+
+
+
+    
 
     
 </style>
